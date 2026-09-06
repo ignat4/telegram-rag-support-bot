@@ -1,0 +1,30 @@
+services:
+  backend:
+    build: .
+    container_name: rag_backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n_local
+    ports:
+      - "5678:5678"
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=https://localhost:5678/
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./Telegram_RAG.json:/data/Telegram_RAG.json  
+
+volumes:
+  n8n_data:

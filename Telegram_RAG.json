@@ -1,0 +1,436 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:8000/ask",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"question\": \"={{ $('Webhook').item.json.body.message.text }}\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        464,
+        96
+      ],
+      "id": "8e9d25ae-42b3-423b-9d4d-500908b0ebe8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "62dc3ebf-df33-4771-bef7-7d9305bc631f",
+              "leftValue": "={{ $json.body.message.text }}",
+              "rightValue": "/",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -624,
+        96
+      ],
+      "id": "58811646-4a8f-42ea-abdf-3bbcb76066f3",
+      "name": "якщо команда через /"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f9d2bde2-b82e-4692-846f-6917f01fe272",
+              "leftValue": "=={{ $json.answer }}",
+              "rightValue": "ESCALATE",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        96
+      ],
+      "id": "71b6d937-2b09-4d39-a542-64b69c4956e5",
+      "name": "якщо немає відповіді в базі"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.message.chat.id }}",
+        "text": "Вибачте, я розумію лише текстові повідомлення.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        288
+      ],
+      "id": "1b1a7f87-bf23-47a2-9354-7f82bd17f25e",
+      "name": "повідомлення що це не текст",
+      "webhookId": "8b309c19-2e53-4807-830e-2085847a2fb4",
+      "credentials": {
+        "telegramApi": {
+          "id": "fSh96IgDXORiU1Je",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.message.chat.id }}",
+        "text": "Перемикаю на оператора. Очікуйте...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        -96
+      ],
+      "id": "d0c29969-2566-4b68-98f0-6287cb981d3e",
+      "name": "перемикання на оператора",
+      "webhookId": "8b309c19-2e53-4807-830e-2085847a2fb4",
+      "credentials": {
+        "telegramApi": {
+          "id": "fSh96IgDXORiU1Je",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.message.chat.id }}",
+        "text": "Привіт! Я AI-помічник служби підтримки. Напишіть своє запитання, і я спробую допомогти.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -352,
+        -96
+      ],
+      "id": "17457e15-7c16-4163-a3f0-92e48e9ea586",
+      "name": "привітання",
+      "webhookId": "8b309c19-2e53-4807-830e-2085847a2fb4",
+      "credentials": {
+        "telegramApi": {
+          "id": "fSh96IgDXORiU1Je",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.message.chat.id }}",
+        "text": "На жаль, я не знайшов відповіді на це питання. Якщо ви хочете покликати живого оператора, напишіть у відповідь слово «Оператор» (або просто продовжіть ставити запитання, якщо хочете спробувати інакше).",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": []
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        -96
+      ],
+      "id": "4d8e852d-28e4-4fac-aa26-39946a6d10a9",
+      "name": "немає в базі",
+      "webhookId": "7a41028a-19a2-41f2-9338-8618911b8818",
+      "credentials": {
+        "telegramApi": {
+          "id": "fSh96IgDXORiU1Je",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.message.chat.id }}",
+        "text": "={{ $('HTTP Request').item.json.answer }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        96
+      ],
+      "id": "f2e6a769-16b5-46f7-bb9f-6e62eb6c4c8a",
+      "name": "відповідь",
+      "webhookId": "3ee8a0cd-97b5-44c4-bcf8-763c0dc68204",
+      "credentials": {
+        "telegramApi": {
+          "id": "fSh96IgDXORiU1Je",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d78e4bd2-779f-40e7-94d3-a85ab3495758",
+              "leftValue": "={{ $json.body.message.text.toLowerCase() }}",
+              "rightValue": "оператор",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        96
+      ],
+      "id": "d254b7a2-3fd0-4c30-b6d2-42f6d165061f",
+      "name": "виклик оператора або нi"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:8000/operator",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"user_id\": {{ $('Webhook').item.json.body.message.from.id}},\n  \"username\": \"{{ $('Webhook').item.json.body.message.from.username}}\",\n  \"message\": \"{{ $('Webhook').item.json.body.message.text}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        592,
+        -96
+      ],
+      "id": "ce922036-b021-4b27-94c9-1225e1859269",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "telegram-webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -880,
+        96
+      ],
+      "id": "4b88e738-ac9c-4742-8199-269c38a6a3e2",
+      "name": "Webhook",
+      "webhookId": "711b76af-7473-47f1-a1cd-4f8ae2d33702"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "82fbe94e-79c7-442b-b7ac-1dcc7a3815cd",
+              "leftValue": "={{ $json.body.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        96
+      ],
+      "id": "f817d31f-029f-419d-8e2f-3357559a4e93",
+      "name": "текст або нi"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "якщо немає відповіді в базі",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "якщо команда через /": {
+      "main": [
+        [
+          {
+            "node": "привітання",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "текст або нi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "якщо немає відповіді в базі": {
+      "main": [
+        [
+          {
+            "node": "немає в базі",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "відповідь",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "виклик оператора або нi": {
+      "main": [
+        [
+          {
+            "node": "перемикання на оператора",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "перемикання на оператора": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "якщо команда через /",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "текст або нi": {
+      "main": [
+        [
+          {
+            "node": "виклик оператора або нi",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "повідомлення що це не текст",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "79ff9703-ff84-4f5d-83a1-a640d5262cd6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "db1c8935749330ffe063dda475673ad8cf960e8f03a6a3fa8a6c4c6a3ba220b0"
+  },
+  "nodeGroups": [],
+  "id": "4oCIKleFRAEJ6o0I",
+  "tags": []
+}
